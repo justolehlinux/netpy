@@ -1,31 +1,28 @@
 import netaddr
 
 class network:
-    def __init__(self, ip, cidr):
+    def __init__(self, ip, cidr=None):
         self.IP = netaddr.IPNetwork(ip)
-        self.CIDR = self.IP.prefixlen = cidr
+        self.Network = self.IP.network
+        if cidr is None:
+            cidr = self.IP.prefixlen 
+        else: self.IP.prefixlen = cidr
+
         self.ip_list = list(self.IP)
         self.SIZE = len(self.ip_list)
-        self.NAME = f"NETWORK_{ip}/{cidr}"
-        # ip = IPNetwork('192.0.2.0/24')
+        self.NAME = f"NETWORK_{self.Network}/{cidr}"
+        self.Broadcast = self.IP.broadcast
+        self.Netmask = self.IP.netmask
 
-        # ip.ip
-        # IPAddress('192.0.2.0')
-
-        # ip.network, ip.broadcast
-        # (IPAddress('192.0.2.0'), IPAddress('192.0.2.255'))
-
-        # ip.netmask, ip.hostmask
-        # (IPAddress('255.255.255.0'), IPAddress('0.0.0.255'))
-
-        # ip.size
-        # 256
 
     def name(self):
         return self.NAME
     def size(self):
         return self.SIZE
-
+    def broadcast(self):
+        return self.Broadcast
+    def all(self):
+        return self.NAME, self.SIZE, self.Netmask, self.Broadcast
 class Host:
     def __init__(self, num, ip, dev=None): 
         self.IP = netaddr.IPAddress(ip)
@@ -38,8 +35,8 @@ class Host:
         return self.NAME
 
 if __name__ == "__main__":
-    net1 = network('192.168.0.0', 24)
-    print(net1.size())
+    net1 = network('192.168.0.0/24')
+    print(net1.all())
 
     host1 = Host(22, '192.168.0.2', "lol")
     print(host1.name())
